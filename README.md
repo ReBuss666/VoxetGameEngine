@@ -1,219 +1,102 @@
-# Архитектура Секторного Движка (Doom-style)
+# 🌀 VoxetGameEngine
 
-## 📋 Обзор
-
-Переход от grid-based raycaster к sector-based engine для поддержки:
-- ✅ Разноуровневые полы и потолки
-- ✅ Ступеньки и лестницы
-- ✅ Окна и проемы
-- ✅ Сложная геометрия карт
-- ✅ Двери и подвижные платформы (в будущем)
+**VoxetGameEngine** — это 2.5D секторный игровой движок на **C++** и **SFML**, созданный в духе классических движков 90-х (_Doom / Build Engine_). Движок сочетает ретро-эстетику с современным архитектурным подходом: рекурсивный рендеринг порталов, виртуальное разрешение UI, GLSL-шейдеры и процедурные визуальные эффекты.
 
 ---
 
-## 🏗️ Основные Концепции
+## 📽️ Демонстрация (Preview)
 
-### 1. **Sector (Сектор)**
-Замкнутый полигональный регион с:
-- `floorHeight` - высота пола
-- `ceilingHeight` - высота потолка
-- `floorTexture` - текстура пола
-- `ceilingTexture` - текстура потолка
-- `lightLevel` - уровень освещения
-- `walls` - список стен сектора
+![Voxet Engine Demo](docs/preview.gif)
 
-### 2. **Wall (Стена)**
-Линия между двумя точками:
-- `start` - начальная точка (x, y)
-- `end` - конечная точка (x, y)
-- `neighborSector` - ID соседнего сектора (nullptr = твердая стена)
-- `upperTexture` - текстура над проемом
-- `middleTexture` - текстура стены
-- `lowerTexture` - текстура под проемом
-
-### 3. **Portal**
-Если `wall.neighborSector != nullptr`, стена является порталом:
-- Можно видеть соседний сектор
-- Если разница высот полов > 0 → нижняя текстура (ступенька вверх)
-- Если разница высот потолков < 0 → верхняя текстура (окно)
+> _Если гифка ещё не записана, сохраните её по пути `docs/preview.gif` (инструкция по записи ниже)._
 
 ---
 
-## 📂 Структура Файлов
+## ✨ Ключевые Возможности
 
-```
-include/
-├── World/
-│   ├── Sector.h              # NEW - Класс сектора
-│   ├── Wall.h                # NEW - Класс стены
-│   ├── SectorMap.h           # NEW - Карта секторов (замена Map.h)
-│   └── MapLoader.h           # NEW - Загрузка карт из JSON/текста
-│
-├── Rendering/
-│   ├── SectorRenderer.h      # NEW - Рендерер секторов (замена RayCasterRenderer)
-│   ├── PortalRenderer.h      # NEW - Рендеринг порталов
-│   └── TextureAtlas.h        # NEW - Управление текстурами
-│
-└── Utils/
-    └── Geometry.h            # NEW - Геометрические утилиты
+### 📐 Секторная Геометрия и Порталы
 
-src/
-├── World/
-│   ├── Sector.cpp
-│   ├── Wall.cpp
-│   ├── SectorMap.cpp
-│   └── MapLoader.cpp
-│
-└── Rendering/
-    ├── SectorRenderer.cpp
-    └── PortalRenderer.cpp
-```
+- **Секторная архитектура:** Разноуровневые полы и потолки (`floorHeight`, `ceilingHeight`), индивидуальные текстуры и уровни освещения.
+- **Портальная система:** Бесшовные переходы между секторами, поддержка ступеней, окон и дверных проёмов.
+- **Двухмерная коллизия:** Проверка пересечения со стенами с учётом высоты шага (`STEP_HEIGHT`).
+- **JSON-Формат карт:** Легко читаемый и редактируемый текстовый формат хранения геометрии уровней.
+
+### 🎨 Рендеринг и Визуальные Эффекты
+
+- **Двухуровневый рендеринг:**
+  - Внутренний низкополигональный 3D-буфер для ретро-картинки.
+  - Фиксированный виртуальный интерфейс **1920x1200** (`VIRTUAL_WIDTH` / `VIRTUAL_HEIGHT`) с автоматической коррекцией соотношения сторон (letterboxing/pillarboxing).
+- **Динамическое освещение:** Квадратичное затухание света от расстояния, локальное освещение и эффекты вспышки выстрела (_Muzzle Flash_).
+- **Процедурный эффект огня (`FireEffect`):** Классический алгоритм огня (PSX/Doom style) с палитрой из 37 цветов и стартовой вспышкой.
+- **GLSL-Шейдеры:** Попиксельный диагональный блик (под 45°) на логотипе `VOXET` с квантованием яркости под ретро-стиль.
+- **Анимированный UI:** Подъем логотипа из огня, органическая микро-дрожь и плавное появление элементов управления.
+
 ---
 
-## 🔧 Ключевые Алгоритмы
+## 🏗️ Структура Проекта
 
-### 1. **Portal Rendering Algorithm**
+```text
+VoxetGameEngine/
+├── assets/                  # Игровые ресурсы
+│   ├── fonts/               # Шрифт (Orbitron-Black.ttf)
+│   ├── maps/                # Карты уровней (*.json)
+│   ├── textures/            # Текстуры стен, пола и потолка
+│   └── VOXET.png            # Логотип главного меню
+├── include/
+│   ├── Core/                # Менеджеры состояний и ресурсов
+│   ├── Rendering/           # SectorRenderer, FireEffect
+│   ├── States/              # MenuState, PlayState, PauseState, OptionsState
+│   ├── UI/                  # Кнопки и виртуальный интерфейс
+│   ├── Utils/               # settings.h (VIRTUAL_WIDTH/HEIGHT)
+│   └── World/               # Sector, Wall, SectorMap, MapLoader
+├── src/                     # Исходный код C++
+├── docs/                    # Документация и медиа-файлы
+├── CMakeLists.txt           # Скрипт сборки CMake
+└── settings.cfg             # Конфигурация пользователя
 
-```cpp
-void renderSector(Sector& sector, FrustumClip& frustum) {
-    // 1. Отрендерить все видимые стены
-    for (auto& wall : sector.walls) {
-        if (!frustum.isVisible(wall)) continue;
-        
-        if (wall.neighborSector == nullptr) {
-            // Твердая стена
-            renderSolidWall(wall, sector);
-        } else {
-            // Портал
-            Sector& neighbor = *wall.neighborSector;
-            
-            // Рендер верхней/нижней частей
-            if (neighbor.ceilingHeight < sector.ceilingHeight)
-                renderUpperWall(wall, sector, neighbor);
-            if (neighbor.floorHeight > sector.floorHeight)
-                renderLowerWall(wall, sector, neighbor);
-            
-            // Рекурсивно отрендерить соседний сектор
-            FrustumClip newFrustum = frustum.clipToPortal(wall);
-            renderSector(neighbor, newFrustum);
-        }
-    }
-    
-    // 2. Отрендерить пол и потолок
-    renderFloorCeiling(sector, frustum);
-}
-```
----
-### 2. **Line-Segment Collision**
-
-```cpp
-bool checkWallCollision(Vector2f pos, float radius, Wall& wall) {
-    // Найти ближайшую точку на линии стены
-    Vector2f closest = closestPointOnSegment(pos, wall.start, wall.end);
-    float dist = distance(pos, closest);
-    
-    if (dist < radius) {
-        // Если стена - портал, проверить высоту
-        if (wall.neighborSector) {
-            float heightDiff = wall.neighborSector->floorHeight - currentSector->floorHeight;
-            if (heightDiff <= STEP_HEIGHT) {
-                // Можно пройти (ступенька)
-                return false;
-            }
-        }
-        return true; // Коллизия
-    }
-    return false;
-}
 ```
 
 ---
 
-## 📐 Формат Карты (JSON)
+## ⚙️ Требования и Сборка
 
-```json
-{
-  "sectors": [
-    {
-      "id": 0,
-      "floorHeight": 0.0,
-      "ceilingHeight": 2.5,
-      "floorTexture": "floor_stone.png",
-      "ceilingTexture": "ceiling_wood.png",
-      "lightLevel": 200,
-      "walls": [
-        {
-          "start": [0, 0],
-          "end": [5, 0],
-          "neighborSector": null,
-          "middleTexture": "wall_brick.png"
-        },
-        {
-          "start": [5, 0],
-          "end": [5, 5],
-          "neighborSector": 1,
-          "upperTexture": "wall_brick.png",
-          "lowerTexture": "wall_stone.png"
-        }
-      ]
-    },
-    {
-      "id": 1,
-      "floorHeight": 0.5,
-      "ceilingHeight": 3.0,
-      "walls": [...]
-    }
-  ],
-  "playerStart": {
-    "sector": 0,
-    "position": [2.5, 2.5],
-    "angle": 0
-  }
-}
+### Зависимости
+
+- **C++20** совместимый компилятор (GCC, Clang, MSVC)
+- **CMake** (v3.16+)
+- **SFML** (v2.6+ / v3.0+)
+- **OpenGL** (для поддержки GLSL шейдеров)
+
+### Сборка под Linux (Arch / Ubuntu)
+
+```bash
+# 1. Клонирование репозитория
+git clone [https://github.com/your-username/VoxetGameEngine.git](https://github.com/your-username/VoxetGameEngine.git)
+cd VoxetGameEngine
+
+# 2. Конфигурация CMake
+cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+# 3. Компиляция
+cmake --build build -j$(nproc)
+
+# 4. Запуск
+./build/VoxetGameEngine
+
 ```
 
 ---
 
-## 🎮 Обновления Игровой Логики
+## 🎮 Управление
 
-### Player Changes
-
-```cpp
-class Player {
-    // NEW
-    float height;          // Высота игрока (например, 1.8м)
-    float eyeHeight;       // Высота глаз (1.6м от пола)
-    Sector* currentSector; // Текущий сектор
-    
-    // Обновленная физика
-    void updatePhysics(float dt) {
-        // Гравитация
-        if (!onGround) {
-            velocityZ -= GRAVITY * dt;
-        }
-        
-        // Проверка коллизий со стенами
-        for (auto& wall : currentSector->walls) {
-            if (checkWallCollision(position, PLAYER_RADIUS, wall)) {
-                // Обработка коллизии
-            }
-        }
-        
-        // Обновление текущего сектора
-        updateCurrentSector();
-    }
-};
-```
----
-
-## ⚠️ Возможные Проблемы
-
-1. **Сложность порталов** - Рекурсия может быть медленной
-
-2. **Z-fighting на полах** - Артефакты рендеринга
-
-3. **Невыпуклые сектора** - Могут ломать рендеринг
-
-4. **Текстуры стен** - UV-mapping сложнее чем в grid
+| Раздел              | Клавиша / Действие       | Функция                              |
+| ------------------- | ------------------------ | ------------------------------------ |
+| **Главное меню**    | `Стрелки Влево / Вправо` | Переключение карт                    |
+|                     | `ЛКМ` / `Enter`          | Выбор пункта меню / Пропуск анимации |
+| **Игровой процесс** | `W`, `A`, `S`, `D`       | Перемещение                          |
+|                     | `Мышь`                   | Обзор (Lock Mouse)                   |
+|                     | `Space` / `Shift` / `C`  | Прыжок / Бег / Присесть              |
+|                     | `ЛКМ`                    | Выстрел (с Muzzle Flash)             |
+|                     | `ESC`                    | Пауза / Освободить мышь              |
 
 ---
