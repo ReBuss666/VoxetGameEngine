@@ -98,7 +98,7 @@ inline constexpr float GRAVITY = 980.0f;
 inline constexpr float MAX_FALL_SPEED = 1000.0f;
 
 namespace Assets {
-inline constexpr const char *LOGO_TEXTURE = "../assets/logo.png";
+inline constexpr const char *LOGO_TEXTURE = "assets/VOXET.png";
 inline constexpr const char *WALL_TEXTURE = "assets/textures/walls/brick.png";
 
 inline constexpr const char *FONT_PRIMARY = "assets/fonts/Orbitron-Black.ttf";

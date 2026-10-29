@@ -7,8 +7,8 @@
 
 class FireEffect {
 public:
-  // Дефолтные параметры: сетка 320x200 с размером пикселя 6 идеально заполняет
-  // 1920x1200
+  // Дефолтные параметры под сетку 320x200 (pixelSize = 6 идеально заполняет
+  // VIRTUAL 1920x1200)
   explicit FireEffect(int width = 320, int height = 200, int pixelSize = 6);
   ~FireEffect() = default;
 

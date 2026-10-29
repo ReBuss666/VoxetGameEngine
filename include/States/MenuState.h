@@ -40,6 +40,9 @@ private:
   float shinePos_ = -1.0f;
   float targetY_ = 0.f;
 
+  sf::Shader shineShader_;
+  bool shaderLoaded_ = false;
+
   bool logoAnimationComplete_ = false;
   float buttonsFadeAlpha_ = 0.f;
 

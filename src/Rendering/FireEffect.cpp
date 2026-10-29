@@ -12,9 +12,12 @@ FireEffect::FireEffect(int width, int height, int pixelSize)
   initPalette();
   vertices_.resize(width * height * 6);
 
-  std::cout << "[FireEffect] Initialized " << width << "x" << height
-            << " with pixel size " << pixelSize_ << " (" << (width * height * 6)
-            << " vertices)" << std::endl;
+  // Запускаем стартовую вспышку при создании эффекта
+  triggerFlash();
+
+  std::cout << "[FireEffect] Initialized " << width << "x" << height << " ("
+            << (width * height * 6) << " vertices) with initial flash"
+            << std::endl;
 }
 
 void FireEffect::initPalette() {
