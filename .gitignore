@@ -35,8 +35,8 @@
 *.hex
 
 # Бинарники проекта (добавьте имя вашего исполняемого файла)
-MyGame
-MyGame.exe
+Voxet
+VoxetGameEngine
 
 # Build directories
 build/
@@ -47,6 +47,9 @@ obj/
 cmake-build-*/
 out/
 dist/
+build.ninja
+.ninja_deps
+.ninja_log
 
 # IDE and Editor files
 .vscode/
@@ -70,6 +73,10 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
+.clangd/
+.cache/
+settings.cfg
+*.tmp.json
 
 # Debug files
 *.dSYM/
