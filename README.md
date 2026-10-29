@@ -69,7 +69,7 @@ VoxetGameEngine/
 
 ```bash
 # 1. Клонирование репозитория
-git clone [https://github.com/your-username/VoxetGameEngine.git](https://github.com/your-username/VoxetGameEngine.git)
+git clone [https://github.com/ReBuss666/VoxetGameEngine.git](https://github.com/ReBuss666/VoxetGameEngine.git)
 cd VoxetGameEngine
 
 # 2. Конфигурация CMake
